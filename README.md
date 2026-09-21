@@ -2,7 +2,7 @@
 
 An automated MLOps pipeline that cleans data, trains a model and redeploys it
 behind an API with a web front-end. Orchestrated by **Apache Airflow**, it runs
-end to end **every 5 minutes**.
+end to end **every 5 minutes**
 
 | Stage | What it does | Code | Artifacts |
 |---|---|---|---|
@@ -59,7 +59,7 @@ used in the labs.
 
 ## Quick start
 
-### 0. Prerequisites
+### Prerequisites
 
 * Python 3.11
 * Docker with the Compose plugin (`docker compose version`)
