@@ -19,9 +19,8 @@ try:  # Airflow 3.x
 except ImportError:  # Airflow 2.x
     from airflow.operators.bash import BashOperator
 
-# services/airflow/dags/mlops_pipeline.py -> repository root
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-PYTHON = sys.executable  # the interpreter Airflow itself runs in
+PYTHON = sys.executable
 
 COMPOSE_DIR = PROJECT_ROOT / "code" / "deployment"
 
@@ -38,7 +37,7 @@ with DAG(
     start_date=pendulum.datetime(2026, 1, 1, tz="Europe/Moscow"),
     schedule="*/5 * * * *",
     catchup=False,
-    max_active_runs=1,  # never let two runs rebuild the images at the same time
+    max_active_runs=1,
     dagrun_timeout=timedelta(minutes=10),
     tags=["pmldl", "mlops"],
 ) as dag:

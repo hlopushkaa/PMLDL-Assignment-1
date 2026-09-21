@@ -60,7 +60,6 @@ HYPERPARAMS = {
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 log = logging.getLogger("model-engineering")
 
-# The pipeline runs every 5 minutes; no need to phone home each time.
 os.environ.setdefault("MLFLOW_DISABLE_TELEMETRY", "true")
 os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")
 
@@ -184,7 +183,7 @@ def main() -> None:
 
     model = build_pipeline()
 
-    import mlflow  # imported late so stage 1 does not depend on it
+    import mlflow
     import mlflow.sklearn
 
     MLFLOW_ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -214,8 +213,6 @@ def main() -> None:
             model,
             name="model",
             input_example=X_train.head(3),
-            # cloudpickle keeps tree-based estimators loadable without the
-            # extra trusted-types dance the skops format requires
             serialization_format="cloudpickle",
         )
 
@@ -228,9 +225,7 @@ def main() -> None:
         test_metrics["r2"],
     )
 
-    # Package the model so the deployment stage can pick it up.
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    # compress=3 keeps the artifact around 10 MB, small enough for GitHub
     joblib.dump(model, MODELS_DIR / "model.pkl", compress=3)
     (MODELS_DIR / "metrics.json").write_text(
         json.dumps({"train": train_metrics, "test": test_metrics}, indent=2)

@@ -72,6 +72,6 @@ def predict(payload: HousingInput) -> Prediction:
     try:
         features = build_features(raw)
         value = float(model.predict(features)[0])
-    except Exception as exc:  # malformed input reaching the model
+    except Exception as exc:
         raise HTTPException(status_code=422, detail=f"Prediction failed: {exc}") from exc
     return Prediction(prediction=value, target=meta.get("target", "target"))

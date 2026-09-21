@@ -50,17 +50,14 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """Remove duplicates, impute missing values and drop outliers."""
     report: dict = {"rows_raw": int(len(df))}
 
-    # 1. duplicates
     before = len(df)
     df = df.drop_duplicates().reset_index(drop=True)
     report["duplicates_removed"] = before - len(df)
 
-    # 2. rows without a target are useless for supervised training
     before = len(df)
     df = df.dropna(subset=[TARGET]).reset_index(drop=True)
     report["rows_without_target_removed"] = before - len(df)
 
-    # 3. missing values: median for numeric, mode for categorical
     numeric_cols = df.select_dtypes(include="number").columns.tolist()
     missing_filled: dict[str, int] = {}
     for col in numeric_cols:
@@ -75,12 +72,10 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             missing_filled[col] = n_missing
     report["missing_values_imputed"] = missing_filled
 
-    # 4. outliers: capped target values
     before = len(df)
     df = df[df[TARGET] < TARGET_CAP].reset_index(drop=True)
     report["capped_target_rows_removed"] = before - len(df)
 
-    # 5. outliers: IQR rule on heavy-tailed count columns
     iqr_removed: dict[str, int] = {}
     for col in IQR_COLUMNS:
         q1, q3 = df[col].quantile(0.25), df[col].quantile(0.75)

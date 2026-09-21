@@ -14,12 +14,11 @@ import streamlit as st
 API_URL = os.getenv("API_URL", "http://api:8000")
 TIMEOUT = 10
 
-st.set_page_config(page_title="California Housing Price", page_icon="🏠")
+st.set_page_config(page_title="California Housing Price", layout="centered")
 
 
 @st.cache_data(ttl=30)
 def fetch_meta() -> dict | None:
-    """Input schema of the deployed model (refreshed every 30 s)."""
     try:
         response = requests.get(f"{API_URL}/meta", timeout=TIMEOUT)
         response.raise_for_status()
@@ -28,8 +27,11 @@ def fetch_meta() -> dict | None:
         return None
 
 
-st.title("🏠 California Housing Price Prediction")
-st.caption("PMLDL Assignment 1 — model served by FastAPI, UI by Streamlit")
+st.markdown(
+    "<h1 style='white-space:nowrap; font-size:clamp(1.1rem,3.6vw,2.4rem);"
+    " margin:0 0 1.5rem'>California Housing Price Prediction</h1>",
+    unsafe_allow_html=True,
+)
 
 meta = fetch_meta()
 
@@ -50,11 +52,9 @@ if metrics:
 st.subheader("District parameters")
 
 values: dict[str, float | str] = {}
-fields = meta["fields"]
-
-# Two columns keep the form compact.
 left, right = st.columns(2)
-for index, field in enumerate(fields):
+
+for index, field in enumerate(meta["fields"]):
     container = left if index % 2 == 0 else right
     if field["type"] == "category":
         options = field["options"]

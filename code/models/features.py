@@ -10,7 +10,6 @@ import pandas as pd
 
 TARGET = "median_house_value"
 
-# Raw columns the user (or the app) provides.
 RAW_NUMERIC = [
     "longitude",
     "latitude",
@@ -23,7 +22,6 @@ RAW_NUMERIC = [
 ]
 RAW_CATEGORICAL = ["ocean_proximity"]
 
-# Columns derived below.
 DERIVED_NUMERIC = [
     "rooms_per_household",
     "bedrooms_per_room",
@@ -52,7 +50,6 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     out["population_per_household"] = out["population"] / households
 
     out[DERIVED_NUMERIC] = out[DERIVED_NUMERIC].astype("float64")
-    # A division by zero can only come from malformed input; fall back to 0.
     out[DERIVED_NUMERIC] = out[DERIVED_NUMERIC].fillna(0.0)
 
     return out[FEATURE_COLUMNS]
