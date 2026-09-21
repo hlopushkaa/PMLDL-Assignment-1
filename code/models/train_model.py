@@ -142,6 +142,37 @@ def build_meta(train_raw: pd.DataFrame, metrics: dict[str, float]) -> dict:
     }
 
 
+def setup_experiment(mlflow) -> None:
+    """Point MLflow at this checkout's artifact folder.
+
+    An existing tracking database carries the absolute artifact path of the
+    machine that created it. If the project was copied from somewhere else,
+    that path does not exist here and every run would fail on writing
+    artifacts, so the stale experiment is archived and a fresh one is created.
+    """
+    expected = MLFLOW_ARTIFACTS.as_uri()
+    experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
+
+    if experiment is not None and experiment.artifact_location != expected:
+        log.warning(
+            "Experiment %r points at %s, which does not belong to this checkout. "
+            "Renaming it and starting a fresh experiment.",
+            EXPERIMENT_NAME,
+            experiment.artifact_location,
+        )
+        from mlflow.tracking import MlflowClient
+
+        MlflowClient().rename_experiment(
+            experiment.experiment_id, f"{EXPERIMENT_NAME}-stale-{experiment.experiment_id}"
+        )
+        experiment = None
+
+    if experiment is None:
+        mlflow.create_experiment(EXPERIMENT_NAME, artifact_location=expected)
+
+    mlflow.set_experiment(EXPERIMENT_NAME)
+
+
 def main() -> None:
     train_raw, test_raw = load_splits()
     log.info("Train: %d rows | Test: %d rows", len(train_raw), len(test_raw))
@@ -161,11 +192,7 @@ def main() -> None:
     mlflow.set_tracking_uri(tracking_uri)
     log.info("MLflow tracking URI: %s", tracking_uri)
 
-    if mlflow.get_experiment_by_name(EXPERIMENT_NAME) is None:
-        mlflow.create_experiment(
-            EXPERIMENT_NAME, artifact_location=MLFLOW_ARTIFACTS.as_uri()
-        )
-    mlflow.set_experiment(EXPERIMENT_NAME)
+    setup_experiment(mlflow)
 
     with mlflow.start_run() as run:
         mlflow.log_params(HYPERPARAMS)
