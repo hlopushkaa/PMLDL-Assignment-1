@@ -1,0 +1,9 @@
+# Must match the training environment for scikit-learn / numpy / joblib,
+# otherwise the pickled model may fail to load.
+fastapi==0.136.3
+uvicorn[standard]==0.46.0
+pydantic==2.13.3
+pandas==3.0.2
+numpy==2.4.4
+scikit-learn==1.8.0
+joblib==1.5.3

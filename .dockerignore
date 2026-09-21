@@ -1,0 +1,10 @@
+# Keep the build context small: only code/ and models/ are needed.
+.git
+.venv
+__pycache__
+*.pyc
+mlruns/
+data/
+notebooks/
+services/
+README.md

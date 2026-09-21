@@ -1,0 +1,16 @@
+# Pipeline environment: stages 1-2 and the Airflow orchestration.
+# The API and the app install their own dependencies inside their containers
+# (code/deployment/api/requirements.txt, code/deployment/app/requirements.txt).
+#
+# scikit-learn / numpy / joblib are pinned to exactly the same versions in the
+# API image, because the model is unpickled there and pickles do not survive
+# scikit-learn version drift.
+
+pandas==3.0.2
+numpy==2.4.4
+scikit-learn==1.8.0
+joblib==1.5.3
+mlflow==3.16.1
+
+# Orchestration (Airflow does not support Windows -- use WSL or Docker there).
+apache-airflow==3.3.2
