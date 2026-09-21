@@ -90,7 +90,10 @@ or stage by stage:
 ```bash
 python code/datasets/prepare_data.py                 # stage 1
 python code/models/train_model.py                    # stage 2
-cd code/deployment && docker compose up -d --build   # stage 3
+
+# stage 3 -- the image must run the same Python the model was pickled with
+export PYTHON_VERSION=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+cd code/deployment && docker compose up -d --build
 ```
 
 Then open:
@@ -188,6 +191,9 @@ containers**:
 * **`pmldl-api`** — FastAPI + Uvicorn on port **8000**. The build context is the
   repository root, so each build copies the freshly trained `models/model.pkl`
   into the image; the model layer is copied last, so only that layer is rebuilt.
+  The base image follows the `PYTHON_VERSION` build argument, which the pipeline
+  sets from the interpreter that trained the model — a pickle written by one
+  Python version is not guaranteed to load under another.
   * `GET /health` — liveness
   * `GET /meta` — input schema + test metrics of the deployed model
   * `POST /predict` — prediction for one district

@@ -1,6 +1,6 @@
-# Stage 3: the model API and the web application run in two separate containers.
-# The build context is the repository root so that the image build can pick up
-# the model produced by stage 2.
+# The model API and the web application run in two separate containers.
+# PYTHON_VERSION is exported by the pipeline so that the image matches the
+# interpreter the model was trained with -- pickles do not cross versions.
 
 name: pmldl-assignment1
 
@@ -9,6 +9,8 @@ services:
     build:
       context: ../..
       dockerfile: code/deployment/api/Dockerfile
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.11}
     container_name: pmldl-api
     ports:
       - "8000:8000"
@@ -24,6 +26,8 @@ services:
     build:
       context: ../..
       dockerfile: code/deployment/app/Dockerfile
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.11}
     container_name: pmldl-app
     ports:
       - "8501:8501"

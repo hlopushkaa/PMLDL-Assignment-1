@@ -21,6 +21,8 @@ except ImportError:  # Airflow 2.x
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PYTHON = sys.executable
+# The API image must run the same Python the model was pickled with.
+PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
 
 COMPOSE_DIR = PROJECT_ROOT / "code" / "deployment"
 
@@ -57,7 +59,10 @@ with DAG(
     deployment = BashOperator(
         task_id="deployment",
         cwd=str(COMPOSE_DIR),
-        bash_command="docker compose up -d --build --remove-orphans",
+        bash_command=(
+            f"PYTHON_VERSION={PYTHON_VERSION} "
+            "docker compose up -d --build --remove-orphans"
+        ),
         doc_md=(
             "Stage 3: rebuild the API image around the freshly trained model and "
             "(re)start the API and app containers."
