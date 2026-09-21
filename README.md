@@ -21,6 +21,21 @@ used in the labs.
 
 ---
 
+## The running system
+
+**Web application** (<http://localhost:8501>) — the form is built from the
+schema the API publishes, so it always matches the deployed model. Pressing
+**Predict** sends the values to the API and shows the price it returns.
+
+![Streamlit web application showing a prediction](docs/app.png)
+
+**Model API** (<http://localhost:8000/docs>) — `POST /predict` executed from
+Swagger UI, with the model's answer in the response body.
+
+![FastAPI Swagger UI with an executed prediction request](docs/api.png)
+
+---
+
 ## Repository structure
 
 ```
@@ -44,6 +59,7 @@ used in the labs.
 ├── data
 │   ├── raw/housing.csv            # raw data
 │   └── processed/                 # train.csv, test.csv (generated)
+├── docs/                          # screenshots used in this README
 ├── models/                        # model.pkl, model_meta.json, metrics.json (generated)
 ├── notebooks
 │   └── eda.ipynb                  # why the cleaning/feature steps look the way they do
